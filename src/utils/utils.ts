@@ -81,10 +81,17 @@ export function setElementData<T extends Record<string, unknown> | object>(el: H
 /**
  * Получает типизированные данные из dataset атрибутов элемента
  */
-export function getElementData<T extends Record<string, unknown>>(el: HTMLElement, scheme: Record<string, Function>): T {
+type DataTransformer<T = unknown> = (value: string | undefined) => T;
+export function getElementData<T extends Record<string, unknown>>(
+    el: HTMLElement,
+    scheme: Record<keyof T, DataTransformer<T[keyof T]>>
+): T {
     const data: Partial<T> = {};
     for (const key in el.dataset) {
-        data[key as keyof T] = scheme[key](el.dataset[key]);
+        const datasetKey = key as keyof T;
+        if (datasetKey in scheme) {
+            data[datasetKey] = scheme[datasetKey](el.dataset[key]);
+        }
     }
     return data as T;
 }

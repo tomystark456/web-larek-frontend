@@ -1,7 +1,10 @@
 // Хорошая практика даже простые типы выносить в алиасы
 // Зато когда захотите поменять это достаточно сделать в одном месте
+type EventCallback<T = unknown> = (data: T) => void;
+type Subscriber = EventCallback;
+
+// Остальные типы оставляем как есть
 type EventName = string | RegExp;
-type Subscriber = Function;
 type EmitterEvent = {
     eventName: string,
     data: unknown
