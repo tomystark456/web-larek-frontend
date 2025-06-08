@@ -1,149 +1,71 @@
-/**
- * Интерфейс описывает структуру объекта товара.
- */
 export interface Product {
-  /** Уникальный идентификатор товара */
-  id: string;
-
-  /** Описание товара */
-  description: string;
-
-  /** URL изображения товара */
-  image: string;
-
-  /** Название товара */
-  title: string;
-
-  /** Категория, к которой относится товар */
-  category: string;
-
-  /** Цена товара (может быть null, если товар недоступен) */
-  price: number | null;
+	id: string;
+	description: string;
+	image: string;
+	title: string;
+	category: string;
+	price: number | null;
 }
 
-/** Класс-заглушка для UUID */
-class UUID {}
-
-/**
- * Интерфейс карточки товара, расширяет `Product`.
- */
-export interface ProductCard extends Product {
-  /** Опциональный индекс товара в списке */
-  index?: number;
+export interface IBasket {
+	id: string;
+	title: string;
+	price: number;
+	count?: number;
 }
 
-/**
- * Интерфейс формы заказа.
- */
-export interface OrderForm {
-  /** Адрес доставки */
-  address: string;
-
-  /** Способ оплаты */
-  payment: string;
+export interface IOrder {
+	total: number;
+	items: string[];
+	email: string;
+	phone: string;
+	address: string;
+	payment: string;
 }
 
-/**
- * Интерфейс контактной формы.
- */
-export interface ContactForm {
-  /** Электронная почта пользователя */
-  email: string;
-
-  /** Номер телефона пользователя */
-  phoneNumber: string;
+export interface IAppState {
+	catalog: Product[];
+	basket: IBasket[];
+	order: IOrder;
+	orderFormErrors: TFormErrors;
+	contactFormErrors: TFormErrors;
 }
 
-/**
- * Объединенный интерфейс формы заказа и контактной формы.
- * Используется для объединенного представления данных заказа.
- */
-export interface MergedForm extends OrderForm, ContactForm {}
+export type TOrderInput = Pick<
+	IOrder,
+	'payment' | 'address' | 'email' | 'phone'
+>;
 
-/**
- * Интерфейс заказа, включает данные о пользователе, список товаров и итоговую сумму.
- */
-export interface Order extends MergedForm {
-  /** Итоговая сумма заказа */
-  total: number;
+export type TFormErrors = Partial<Record<keyof IOrder, string>>;
 
-  /** Список уникальных идентификаторов товаров в заказе */
-  items: UUID[];
+export type TOrderPayment = Pick<IOrder, 'payment' | 'address'>;
+
+export type TOrderContact = Pick<IOrder, 'email' | 'phone'>;
+
+export type PaymentType = 'card' | 'cash';
+
+export interface ICardActions {
+	onClick: (event: MouseEvent) => void;
 }
 
-/**
- * Тип для хранения ошибок, связанных с формой заказа.
- */
-export type OrderFormError = Partial<Record<keyof OrderForm, string>>;
-
-/**
- * Тип для хранения ошибок, связанных с контактной формой.
- */
-export type ContactFormError = Partial<Record<keyof ContactForm, string>>;
-
-/**
- * Интерфейс состояния приложения.
- * Определяет структуру данных, используемых в приложении.
- */
-export interface AppState {
-  /** Каталог товаров, загруженный с сервера */
-  catalog: Product[];
-
-  /** Товары, добавленные пользователем в корзину */
-  basket: Product[];
-
-  /** Данные текущего заказа */
-  order: Order;
-
-  /** Ошибки, возникшие при заполнении формы заказа */
-  orderFormErrors: OrderFormError;
-
-  /** Ошибки, возникшие при заполнении контактной формы */
-  contactFormErrors: ContactFormError;
-
-  /** Товар для предварительного просмотра в модальном окне */
-  preview: Product | null;
+export interface IBasketActions {
+	onClick: (event: MouseEvent) => void;
 }
 
-/**
- * Интерфейс главной страницы приложения.
- * Определяет структуру данных, используемых для управления отображением товаров и корзины.
- */
-export interface MainPage {
-  /** Количество товаров в корзине */
-  cartCount: number;
 
-  /** Массив элементов товаров, представленных на странице */
-  productElements: HTMLElement[];
 
-  /** Флаг блокировки страницы (например, при открытии модального окна) */
-  locked: boolean;
+export interface ISuccessActions {
+	onClick: (event: MouseEvent) => void;
 }
 
-/**
- * Интерфейс ответа сервера после оформления заказа.
- */
-export interface OrderResponse {
-  /** Уникальный идентификатор заказа */
-  id: UUID;
-
-  /** Итоговая сумма заказа */
-  total: number;
+export interface IFormValidator {
+	valid: boolean;
+	errors: string;
 }
 
-/**
- * Типизированный ответ API, используемый для возврата списка элементов.
- */
-export type ApiResponseList<T> = {
-  /** Общее количество элементов в списке */
-  total: number;
+export interface IApi {
+	get<T>(uri: string): Promise<T>;
+	post<T>(uri: string, data: object, method?: string): Promise<T>;
+}
 
-  /** Массив элементов указанного типа */
-  items: T[];
-};
-
-/**
- * Тип формы, используемой в приложении.
- * Определяет возможные формы для валидации и обработки.
- */
-export type FormType = 'order' | 'contacts';
+export type ProductBasket = Pick<Product, 'id' | 'title' | 'price'>;
