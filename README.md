@@ -225,7 +225,7 @@
 - `protected setVisible(element: HTMLElement)` — показывает элемент.
 - `render(data?: Partial<T>): HTMLElement` — возвращает DOM-элемент.
 
-#### Абстрактный класс Form<T>
+#### Класс Form<T>
 
 База для форм.
 
@@ -242,6 +242,41 @@
 - `set valid(value: boolean)` — управляет активностью кнопки.
 - `set errors(value: string)` — выводит ошибки.
 - `abstract cleanFieldValues(): void` — очищает поля формы.
+
+#### Класс OrderPayment
+
+Управляет формой оплаты заказа.
+
+**Свойства**:
+- `protected _buttonOnline: HTMLButtonElement` — кнопка онлайн-оплаты.
+- `protected _buttonCash: HTMLButtonElement` — кнопка оплаты наличными.
+- `protected _address: HTMLInputElement` — поле адреса.
+
+**Конструктор**:
+- `constructor(container: HTMLFormElement, events: EventEmitter)` — принимает форму и события.
+
+**Методы**:
+- `set address(value: string)` — устанавливает адрес.
+- `togglePayment(value`: HTMLElement — переключает способ оплаты.
+- `resetPayment()` — сбрасывает выбор способа оплаты.
+- `checkValid()` — проверяет валидность формы.
+- `cleanFieldValues():` void — очищает поля формы.
+
+#### Класс OrderContacts
+
+Управляет контактной формой заказа. Наследуется от класса `Form`
+
+**Свойства**:
+- `protected _email: HTMLInputElement` — поле email.
+- `protected _phone: HTMLInputElement` — поле телефона.
+
+**Конструктор**:
+- `constructor(container: HTMLFormElement, events: EventEmitter)` — принимает форму и события.
+**Методы**:
+- `set phone(value: string)` — устанавливает телефон.
+- `set email(value: string)` — устанавливает email.
+- `checkValid()` — проверяет валидность формы.
+- `cleanFieldValues(): void` — очищает поля формы.
 
 #### Класс Api
 
@@ -274,31 +309,57 @@
 - `set catalog(items: HTMLElement[])` — рендерит карточки каталога.
 - `set locked(value: boolean)` — блокирует страницу при открытии модального окна.
 
-#### Класс Card
+### Классы карточек
 
-Отображает карточку товара.
+#### Абстрактный класс BaseCard
+
+Базовый класс для всех типов карточек.
 
 **Свойства**:
-- `protected _id: string` — ID товара.
-- `protected _title: HTMLElement` — заголовок.
-- `protected _image: HTMLImageElement` — изображение.
-- `protected _category: HTMLElement` — категория.
-- `protected _price: HTMLElement` — цена.
-- `protected _description: HTMLElement` — описание.
-- `protected _button: HTMLButtonElement` — кнопка.
+- `protected _title: HTMLElement` — заголовок карточки
+- `protected _price: HTMLElement` — элемент с ценой
+- `protected _button: HTMLButtonElement` — кнопка действия
 
 **Конструктор**:
-- `constructor(container: HTMLElement, actions?: ICardActions)` — принимает контейнер и обработчики событий.
+- `constructor(container: HTMLElement)` — принимает контейнер карточки
 
 **Методы**:
-- `set id(value: string)` — устанавливает ID.
-- `set title(value: string)` — устанавливает заголовок.
-- `set image(value: string)` — устанавливает изображение.
-- `set category(value: string)` — устанавливает категорию.
-- `set price(value: number | null)` — устанавливает цену.
-- `set description(value: string)` — устанавливает описание.
-- `set isInBasket(value: boolean)` — обновляет состояние кнопки.
-- `getCategoryClass(category: string): string` — возвращает CSS-класс для категории.
+- `set title(value: string)` — устанавливает заголовок
+- `set price(value: string | null)` — устанавливает цену, обрабатывает случай "Бесценно"
+- `set buttonText(value: string)` — устанавливает текст кнопки
+
+#### Класс Card
+
+Основной класс для отображения карточек товаров в каталоге и предпросмотре.
+
+**Свойства**:
+- `protected _category: HTMLElement` — категория товара
+- `protected _image: HTMLImageElement` — изображение товара
+- `protected _description?: HTMLElement` — описание товара
+
+**Конструктор**:
+- `constructor(container: HTMLElement, actions?: ICardActions)` — принимает контейнер и обработчики событий
+
+**Методы**:
+- `set id(value: string)` — устанавливает ID товара
+- `set image(value: string)` — устанавливает изображение
+- `set description(value: string)` — устанавливает описание
+- `set category(value: string)` — устанавливает категорию и её стиль
+- `getCategoryClass(category: string): string` — возвращает CSS-класс для категории
+
+#### Класс BasketCard
+
+Специализированный класс для отображения товаров в корзине.
+
+**Свойства**:
+- `protected _index: HTMLElement` — порядковый номер товара
+- `protected _deleteButton: HTMLElement` — кнопка удаления товара
+
+**Конструктор**:
+- `constructor(container: HTMLElement, actions?: ICardActions)` — принимает контейнер и обработчики событий
+
+**Методы**:
+- `set index(value: number)` — устанавливает порядковый номер товара
 
 #### Класс Basket
 
@@ -317,52 +378,54 @@
 - `set total(value: number)` — устанавливает сумму.
 - `disableButton(state: boolean)` — блокирует кнопку при пустой корзине.
 
-#### Класс Order
+#### Класс OrderPayment
+Управляет формой оплаты заказа. Наследуется от `Form<TOrderPayment>`.
 
-Управляет формой заказа.
+**Свойства**
+- `protected _buttonOnline: HTMLButtonElement` — кнопка онлайн-оплаты
+- `protected _buttonCash: HTMLButtonElement` — кнопка оплаты наличными
+- `protected _address: HTMLInputElement` — поле адреса
 
-**Свойства**:
-- `protected _payment: string` — способ оплаты.
-- `protected _address: HTMLInputElement` — поле адреса.
-- `protected _buttons: HTMLButtonElement[]` — кнопки оплаты.
+**Конструктор**
+- `constructor(container: HTMLFormElement, events: IEvents)` — принимает форму и события
 
-**Конструктор**:
-- `constructor(container: HTMLFormElement, events: EventEmitter)` — принимает форму и события.
+**Методы**
+- `set address(value: string)` — устанавливает адрес
+- `togglePayment(value: HTMLElement)` — переключает способ оплаты
+- `resetPayment()` — сбрасывает выбор способа оплаты
+- `checkValid()` — проверяет валидность формы
+- `cleanFieldValues(): void` — очищает поля формы
 
-**Методы**:
-- `set payment(value: string)` — устанавливает способ оплаты.
-- `set address(value: string)` — устанавливает адрес.
-- `cleanFieldValues(): void` — очищает поля.
+#### Класс OrderContacts
 
-#### Класс Contacts
+Управляет контактной формой заказа. Наследуется от `Form<TOrderContact>`.
 
-Управляет контактной формой.
+**Свойства**
+- `protected _email: HTMLInputElement` — поле email
+- `protected _phone: HTMLInputElement` — поле телефона
 
-**Свойства**:
-- `protected _email: HTMLInputElement` — поле email.
-- `protected _phone: HTMLInputElement` — поле телефона.
+**Конструктор**
+- `constructor(container: HTMLFormElement, events: IEvents)` — принимает форму и события
 
-**Конструктор**:
-- `constructor(container: HTMLFormElement, events: EventEmitter)` — принимает форму и события.
-
-**Методы**:
-- `set email(value: string)` — устанавливает email.
-- `set phone(value: string)` — устанавливает телефон.
-- `cleanFieldValues(): void` — очищает поля.
+**Методы**
+- `set email(value: string)` — устанавливает email
+- `set phone(value: string)` — устанавливает телефон
+- `checkValid()` — проверяет валидность формы
+- `cleanFieldValues(): void` — очищает поля формы
 
 #### Класс Success
 
-Отображает успешное оформление.
+Отображает успешное оформление заказа. Наследуется от `Component<ISuccess>`.
 
-**Свойства**:
-- `protected _total: HTMLElement` — итоговая сумма.
-- `protected _button: HTMLButtonElement` — кнопка «За новыми покупками».
+**Свойства**
+- `protected _close: HTMLElement` — кнопка закрытия
+- `protected _description: HTMLElement` — описание заказа
 
-**Конструктор**:
-- `constructor(container: HTMLElement, actions?: ISuccessActions)` — принимает контейнер и обработчики.
+**Конструктор**
+- `constructor(container: HTMLElement, actions: ISuccessActions)` — принимает контейнер и обработчики событий
 
-**Методы**:
-- `set total(value: number)` — устанавливает сумму.
+**Методы**
+- `set total(total: number)` — устанавливает итоговую сумму заказа
 
 #### Класс Modal
 
@@ -379,34 +442,45 @@
 - `open(): void` — открывает модальное окно.
 - `close(): void` — закрывает модальное окно.
 - `set content(value: HTMLElement)` — устанавливает содержимое.
+- `render(): HTMLElement` — возвращает DOM-элемент модального окна с настроенными обработчиками событий для открытия/закрытия.
 
 ### Модель данных
 
 #### Класс AppState
 
-Хранит состояние приложения.
+Хранит состояние приложения. Наследуется от `Model<IAppState>`.
 
 **Свойства**:
-- `catalog: Product[]` — товары каталога.
-- `basket: Product[]` — товары в корзине.
-- `order: Order` — текущий заказ.
-- `orderFormErrors: Partial<Record<keyof Order, string>>` — ошибки формы заказа.
-- `contactFormErrors: Partial<Record<keyof Order, string>>` — ошибки контактной формы.
+- `protected catalog: Product[]` — товары каталога.
+- `protected basket: IBasket[]` — товары в корзине (содержит id, title и price).
+- `protected order: IOrder` — текущий заказ (total, items, email, phone, address, payment).
+- `protected orderFormErrors: TFormErrors` — ошибки формы заказа.
+- `protected contactFormErrors: TFormErrors` — ошибки контактной формы.
+- `protected preview: string | null` — ID товара для предпросмотра.
 
 **Конструктор**:
-- `constructor()` — инициализирует состояние.
+- `constructor(events: IEvents)` — инициализирует состояние и принимает объект событий.
 
 **Методы**:
-- `addBasket(item: Product, quantity: number): void` — добавляет товар в корзину.
-- `deleteBasket(itemId: string): void` — удаляет товар из корзины.
-- `setCatalog(catalog: Product[]): void` — обновляет каталог.
+- `setCatalog(items: Product[]): void` — обновляет каталог товаров.
+- `getCatalog(): Product[]` — возвращает список товаров каталога.
+- `savePreview(item: Product): void` — сохраняет товар для предпросмотра.
+- `addBasket(item: Product): void` — добавляет товар в корзину.
+- `deleteBasket(id: string): void` — удаляет товар из корзины.
+- `getBasket(): IBasket[]` — возвращает содержимое корзины.
 - `getNumberBasket(): number` — возвращает количество товаров в корзине.
-- `getTotalBasket(): number` — возвращает итоговую стоимость.
-- `isInBasket(itemId: string): boolean` — проверяет наличие товара в корзине.
-- `validate(formData: FormData): boolean` — валидирует форму.
-- `prepareOrder(): Order` — готовит заказ для отправки.
+- `getTotalBasket(): number` — возвращает итоговую стоимость корзины.
+- `validate(formData: FormData): boolean` — валидирует все поля формы.
+- `validatePaymentForm(): boolean` — валидирует форму оплаты (payment и address).
+- `validateContactForm(): boolean` — валидирует контактную форму (email и phone).
+- `setOrderField(field: StringOrderFields, value: string): void` — устанавливает значение поля заказа.
+- `prepareOrder(): IOrder` — готовит заказ для отправки на сервер.
 - `cleanBasketState(): void` — очищает корзину.
-- `cleanOrder(): void` — очищает заказ.
+- `cleanOrder(): void` — очищает заказ и ошибки форм.
+- `getCategoryClass(category: string): string` — возвращает CSS-класс для категории
+- `savePreview(item: Product): void` — сохраняет товар для предпросмотра
+- `cleanOrder(): void` — очищает заказ
+- `cleanBasketState(): void` — очищает корзину
 
 ### API
 
@@ -439,15 +513,22 @@
 ### Список событий
 
 #### События моделей
-- `basket:changed` — изменение корзины.
-- `userData:changed` — изменение данных пользователя.
-- `item:selected` — выбор товара.
+- `basket:changed` — изменение корзины
+- `userData:changed` — изменение данных пользователя
+- `item:selected` — выбор товара
+- `catalog:changed` — изменение каталога товаров
+- `formErrors:changed` — изменение ошибок формы
+- `order:changed` — изменение данных заказа
 
 #### События View
-- `card:select` — клик по карточке товара.
-- `basket:open` — открытие корзины.
-- `basket:remove` — удаление товара из корзины.
-- `order:open` — открытие формы заказа.
-- `order:submit` — отправка формы заказа.
-- `contacts:submit` — отправка контактной формы.
-- `success:close` — закрытие окна успеха.
+- `card:select` — клик по карточке товара
+- `basket:open` — открытие корзины
+- `basket:remove` — удаление товара из корзины
+- `order:open` — открытие формы заказа
+- `order:submit` — отправка формы заказа
+- `contacts:submit` — отправка контактной формы
+- `success:close` — закрытие окна успеха
+- `modal:open` — открытие модального окна
+- `modal:close` — закрытие модального окна
+- `order:change` — изменение полей формы заказа (payment, address, email, phone)
+

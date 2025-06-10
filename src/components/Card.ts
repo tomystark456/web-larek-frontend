@@ -11,6 +11,7 @@ export interface ICard {
 	price: number | null;
 	description: string;
 	selected: boolean;
+	buttonText: string;
 	index?: number;
 }
 
@@ -28,10 +29,6 @@ export abstract class BaseCard extends Component<ICard> {
 
 	set title(value: string) {
 		this.setText(this._title, value);
-	}
-
-	get title() {
-		return this._title.textContent || '';
 	}
 
 	set price(value: string | null) {
@@ -73,10 +70,6 @@ export class Card extends BaseCard {
 		this.container.dataset.id = value;
 	}
 
-	get id(): string {
-		return this.container.dataset.id || '';
-	}
-
 	set image(value: string) {
 		this.setImage(this._image, value, this.title);
 	}
@@ -85,18 +78,15 @@ export class Card extends BaseCard {
 		this.setText(this._description, value);
 	}
 
-	get description() {
-		return this._description.textContent || '';
-	}
-
 	set category(value: string) {
 		this.setText(this._category, value);
-		this.toggleClass(this._category, categories.get(value), true);
+		const categoryClass = categories.get(value) || '';
+		this.toggleClass(this._category, categoryClass, true);
 	}
 
-	get category() {
-		return this._category.textContent || '';
-	}
+	set buttonText(value: string) {
+        this._button.textContent = value;
+    }
 }
 
 export class BasketCard extends BaseCard {

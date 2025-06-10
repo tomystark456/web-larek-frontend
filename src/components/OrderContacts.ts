@@ -51,9 +51,29 @@ export class OrderContacts extends Form<TOrderContact> {
 	}
 
 	checkValid() {
-		const emailFilled = this._email.value.trim().length > 0;
-		const phoneFilled = this._phone.value.trim().length > 0;
-		this.valid = emailFilled && phoneFilled;
+		const email = this._email.value.trim();
+		const phone = this._phone.value.trim();
+		let error = '';
+
+		// Валидация email
+		const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+		if (!email) {
+			error = 'Укажите email';
+		} else if (!emailValid) {
+			error = 'Некорректный email';
+		}
+
+		// Валидация телефона (10-15 цифр, допускается +)
+		const phoneDigits = phone.replace(/\D/g, '');
+		const phoneValid = phoneDigits.length >= 10 && phoneDigits.length <= 15;
+		if (!phone) {
+			error = 'Укажите телефон';
+		} else if (!phoneValid) {
+			error = 'Некорректный телефон';
+		}
+
+		this.errors = error;
+		this.valid = !error;
 	}
 
 	cleanFieldValues(): void {

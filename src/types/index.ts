@@ -20,7 +20,7 @@ export interface IOrder {
 	email: string;
 	phone: string;
 	address: string;
-	payment: string;
+	payment: PaymentType;
 }
 
 export interface IAppState {
@@ -47,11 +47,6 @@ export type PaymentType = 'card' | 'cash';
 export interface ICardActions {
 	onClick: (event: MouseEvent) => void;
 }
-
-export interface IBasketActions {
-	onClick: (event: MouseEvent) => void;
-}
-
 
 
 export interface ISuccessActions {

@@ -1,6 +1,7 @@
 import { IEvents } from './base/events';
 import { IAppState, Product, IBasket, IOrder, TFormErrors } from '../types';
 import { Model } from './base/Model';
+import { categories } from '../utils/constants';
 
 type StringOrderFields = Extract<keyof IOrder, 'email' | 'phone' | 'address' | 'payment'>;
 
@@ -13,7 +14,7 @@ export class AppState extends Model<IAppState> {
 		email: '',
 		phone: '',
 		address: '',
-		payment: '',
+		payment: 'card',
 	};
 	protected orderFormErrors: TFormErrors = {};
 	protected contactFormErrors: TFormErrors = {};
@@ -38,6 +39,11 @@ export class AppState extends Model<IAppState> {
 	}
 
 	addBasket(item: Product) {
+		const existingItem = this.basket.find(basketItem => basketItem.id === item.id);
+		if (existingItem) {
+			return;
+		}
+		
 		const basketItem: IBasket = {
 			id: item.id,
 			title: item.title,
@@ -48,8 +54,11 @@ export class AppState extends Model<IAppState> {
 	}
 
 	deleteBasket(id: string) {
-		this.basket = this.basket.filter((item) => item.id !== id);
-		this.emitChanges('basket:changed');
+		const index = this.basket.findIndex(item => item.id === id);
+		if (index !== -1) {
+			this.basket.splice(index, 1);
+			this.emitChanges('basket:changed');
+		}
 	}
 
 	getBasket(): IBasket[] {
@@ -114,7 +123,10 @@ export class AppState extends Model<IAppState> {
 	}
 
 	setOrderField(field: StringOrderFields, value: string) {
-		this.order[field] = value;
+		if (field === 'payment' && (value !== 'card' && value !== 'cash')) {
+			return;
+		}
+		(this.order[field] as any) = value;
 		if (field === 'payment' || field === 'address') {
 			this.validatePaymentForm();
 		}
@@ -144,10 +156,13 @@ export class AppState extends Model<IAppState> {
 			email: '',
 			phone: '',
 			address: '',
-			payment: '',
+			payment: 'card',
 		};
 		this.orderFormErrors = {};
 		this.contactFormErrors = {};
 		this.emitChanges('order:changed');
+	}
+	getCategoryClass(category: string): string {
+		return categories.get(category) || '';
 	}
 } 

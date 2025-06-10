@@ -134,10 +134,32 @@ events.on('contacts:submit', () => {
 
 events.on('success:close', () => {
     modal.close();
+    appState.cleanBasketState();
+    appState.cleanOrder();
 });
 
 events.on('basket:changed', () => {
     page.counter = appState.getNumberBasket();
+    
+    // Обновляем содержимое корзины, если она открыта
+    const basketItems = appState.getBasket().map((item, index) => {
+        const card = new BasketCard(cloneTemplate(cardBasketTemplate), {
+            onClick: () => events.emit('basket:remove', item),
+        });
+        return card.render({
+            title: item.title,
+            price: item.price,
+            index: index + 1
+        });
+    });
+
+    const basket = document.querySelector('.basket') as HTMLElement;
+    if (basket) {
+        new Basket(basket, events).render({
+            items: basketItems,
+            total: appState.getTotalBasket(),
+        });
+    }
 });
 
 events.on('catalog:changed', () => {

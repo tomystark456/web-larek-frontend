@@ -3,14 +3,19 @@
 
 .modal {
   @include mixins.sublayer;
-  position: absolute;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   display: none;
   justify-content: center;
+  align-items: center;
   background-color: $overlayBackground;
   z-index: 100;
-  padding-top: 5vh;
-  padding-bottom: 5vh;
+  padding: 2rem;
   box-sizing: border-box;
+  overflow-y: auto;
 
   &_active {
     display: flex;
@@ -29,6 +34,9 @@
     background-color: $background;
     border-radius: 3rem;
     box-sizing: border-box;
+    max-width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
   }
 
   &__content {
@@ -41,5 +49,6 @@
     right: calc(#{$defaultPadding} / 2);
     @include mixins.icon(2rem, 'close');
     @include mixins.link(white, $hover);
+    z-index: 101;
   }
 }
