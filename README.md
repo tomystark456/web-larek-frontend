@@ -43,7 +43,7 @@
   yarn start
 ```
 
-## Сборка
+### Сборка
 
 ```bash
   npm run build
@@ -176,54 +176,25 @@
   - Счётчик товаров сбрасывается.  
   - Отображается модальное окно с подтверждением.
 
-### Базовые компоненты кода
+### Компоненты интерфейса
 
-#### Класс EventEmitter
+#### Класс Page
 
-Реализует управление событиями.
-
-**Свойства**:
-- `_events: Map<EventName, Set<Subscriber>>` — хранит события и подписчиков.
-
-**Конструктор**:
-- `constructor()` — инициализирует `_events` как `Map`.
-
-**Методы**:
-- `on<T extends object>(eventName: EventName, callback: (event: T) => void)` — регистрирует обработчик для события.
-- `off(eventName: EventName, callback: Subscriber)` — удаляет обработчик.
-- `emit<T extends object>(eventName: string, data?: T)` — инициирует событие, вызывает обработчики.
-- `onAll(callback: (event: EmitterEvent) => void)` — подписка на все события.
-- `offAll()` — удаляет все обработчики.
-- `trigger<T extends object>(eventName: string, context?: Partial<T>)` — возвращает функцию для инициации события.
-
-#### Абстрактный класс Model<T>
-
-Основа для моделей данных, интегрирована с `EventEmitter`.
-
-**Конструктор**:
-- `constructor(data: Partial<T>, events: EventEmitter)` — принимает данные и объект событий.
-
-**Методы**:
-- `emitChanges(event: string, payload?: object)` — уведомляет об изменениях.
-
-#### Абстрактный класс Component<T>
-
-Основа для UI-компонентов.
+Управляет главной страницей.
 
 **Свойства**:
-- `protected readonly component: HTMLElement` — корневой DOM-элемент.
+- `protected container: HTMLElement` — контейнер страницы.
+- `protected _counter: HTMLElement` — счётчик корзины.
+- `protected _catalog: HTMLElement` — контейнер каталога.
+- `protected _wrapper: HTMLElement` — обёртка страницы.
 
 **Конструктор**:
 - `constructor(container: HTMLElement)` — принимает контейнер.
 
 **Методы**:
-- `toggleClass(element: HTMLElement, className: string, force?: boolean)` — переключает класс.
-- `protected setText(element: HTMLElement, value: unknown)` — устанавливает текст.
-- `protected setImage(element: HTMLImageElement, src: string, alt?: string)` — устанавливает изображение.
-- `setDisabled(element: HTMLElement, state: boolean)` — меняет статус блокировки.
-- `protected setHidden(element: HTMLElement)` — скрывает элемент.
-- `protected setVisible(element: HTMLElement)` — показывает элемент.
-- `render(data?: Partial<T>): HTMLElement` — возвращает DOM-элемент.
+- `set counter(value: number)` — устанавливает счётчик корзины.
+- `set catalog(items: HTMLElement[])` — рендерит карточки каталога.
+- `set locked(value: boolean)` — блокирует страницу при открытии модального окна.
 
 #### Класс Form<T>
 
@@ -245,7 +216,7 @@
 
 #### Класс OrderPayment
 
-Управляет формой оплаты заказа.
+Управляет формой оплаты заказа. Наследуется от `Form<TOrderPayment>`.
 
 **Свойства**:
 - `protected _buttonOnline: HTMLButtonElement` — кнопка онлайн-оплаты.
@@ -257,14 +228,14 @@
 
 **Методы**:
 - `set address(value: string)` — устанавливает адрес.
-- `togglePayment(value`: HTMLElement — переключает способ оплаты.
+- `togglePayment(value: HTMLElement)` — переключает способ оплаты.
 - `resetPayment()` — сбрасывает выбор способа оплаты.
 - `checkValid()` — проверяет валидность формы.
-- `cleanFieldValues():` void — очищает поля формы.
+- `cleanFieldValues(): void` — очищает поля формы.
 
 #### Класс OrderContacts
 
-Управляет контактной формой заказа. Наследуется от класса `Form`
+Управляет контактной формой заказа. Наследуется от `Form<TOrderContact>`.
 
 **Свойства**:
 - `protected _email: HTMLInputElement` — поле email.
@@ -272,42 +243,12 @@
 
 **Конструктор**:
 - `constructor(container: HTMLFormElement, events: EventEmitter)` — принимает форму и события.
+
 **Методы**:
-- `set phone(value: string)` — устанавливает телефон.
 - `set email(value: string)` — устанавливает email.
+- `set phone(value: string)` — устанавливает телефон.
 - `checkValid()` — проверяет валидность формы.
 - `cleanFieldValues(): void` — очищает поля формы.
-
-#### Класс Api
-
-Обмен данными с сервером через HTTP.
-
-**Конструктор**:
-- `constructor(baseUrl: string, options?: RequestInit)` — принимает базовый URL и опции.
-
-**Методы**:
-- `get<T>(uri: string): Promise<T>` — GET-запрос.
-- `post<T>(uri: string, data: object, method?: string): Promise<T>` — POST-запрос.
-
-### Компоненты интерфейса
-
-#### Класс Page
-
-Управляет главной страницей.
-
-**Свойства**:
-- `protected container: HTMLElement` — контейнер страницы.
-- `protected _counter: HTMLElement` — счётчик корзины.
-- `protected _catalog: HTMLElement` — контейнер каталога.
-- `protected _wrapper: HTMLElement` — обёртка страницы.
-
-**Конструктор**:
-- `constructor(container: HTMLElement)` — принимает контейнер.
-
-**Методы**:
-- `set counter(value: number)` — устанавливает счётчик корзины.
-- `set catalog(items: HTMLElement[])` — рендерит карточки каталога.
-- `set locked(value: boolean)` — блокирует страницу при открытии модального окна.
 
 ### Классы карточек
 
@@ -377,41 +318,6 @@
 - `set items(items: HTMLElement[])` — отображает товары.
 - `set total(value: number)` — устанавливает сумму.
 - `disableButton(state: boolean)` — блокирует кнопку при пустой корзине.
-
-#### Класс OrderPayment
-Управляет формой оплаты заказа. Наследуется от `Form<TOrderPayment>`.
-
-**Свойства**
-- `protected _buttonOnline: HTMLButtonElement` — кнопка онлайн-оплаты
-- `protected _buttonCash: HTMLButtonElement` — кнопка оплаты наличными
-- `protected _address: HTMLInputElement` — поле адреса
-
-**Конструктор**
-- `constructor(container: HTMLFormElement, events: IEvents)` — принимает форму и события
-
-**Методы**
-- `set address(value: string)` — устанавливает адрес
-- `togglePayment(value: HTMLElement)` — переключает способ оплаты
-- `resetPayment()` — сбрасывает выбор способа оплаты
-- `checkValid()` — проверяет валидность формы
-- `cleanFieldValues(): void` — очищает поля формы
-
-#### Класс OrderContacts
-
-Управляет контактной формой заказа. Наследуется от `Form<TOrderContact>`.
-
-**Свойства**
-- `protected _email: HTMLInputElement` — поле email
-- `protected _phone: HTMLInputElement` — поле телефона
-
-**Конструктор**
-- `constructor(container: HTMLFormElement, events: IEvents)` — принимает форму и события
-
-**Методы**
-- `set email(value: string)` — устанавливает email
-- `set phone(value: string)` — устанавливает телефон
-- `checkValid()` — проверяет валидность формы
-- `cleanFieldValues(): void` — очищает поля формы
 
 #### Класс Success
 

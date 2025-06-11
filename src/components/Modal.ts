@@ -34,9 +34,17 @@ export class Modal extends Component<IModal> {
 	}
 
 	close() {
+		// Check if we're closing a success modal
+		const isSuccessModal = this._content.querySelector('.order-success') !== null;
+		
 		this.toggleClass(this.container, 'modal_active', false);
 		this.content = null;
 		this.events.emit('modal:close');
+		
+		// If it's a success modal, trigger the success:close event
+		if (isSuccessModal) {
+			this.events.emit('success:close');
+		}
 	}
 
 	render(data: IModal): HTMLElement {
